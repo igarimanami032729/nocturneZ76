@@ -1,0 +1,99 @@
+@font-face {
+  font-family: 'Mulmaru';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2601-4@1.1/Mulmaru.woff2') format('woff2');
+  font-weight: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'GiantsInline';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2307-1@1.1/Giants-Inline.woff2') format('woff2');
+  font-weight: normal;
+  font-display: swap;
+}
+
+/* 제목 반짝이 애니메이션 */
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes sparkle-1 {
+  0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
+  50%       { opacity: 1; transform: scale(1) rotate(180deg); }
+}
+@keyframes sparkle-2 {
+  0%, 100% { opacity: 0; transform: scale(0) rotate(45deg); }
+  40%       { opacity: 1; transform: scale(1.2) rotate(225deg); }
+}
+@keyframes sparkle-3 {
+  0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
+  60%       { opacity: 1; transform: scale(0.9) rotate(135deg); }
+}
+
+.title-giants {
+  font-family: 'GiantsInline', sans-serif;
+  font-size: clamp(3rem, 8vw, 5.5rem);
+  background: linear-gradient(
+    90deg,
+    #b8860b 0%,
+    #ffd700 25%,
+    #fffacd 45%,
+    #ffd700 55%,
+    #daa520 75%,
+    #ffd700 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 3s linear infinite;
+  /* 흰 테두리 */
+  filter:
+    drop-shadow(0 0 1px #fff)
+    drop-shadow(0 0 2px #fff)
+    drop-shadow(0 0 6px rgba(255,215,0,0.6));
+  letter-spacing: 0.08em;
+  position: relative;
+}
+
+.sparkle {
+  position: absolute;
+  pointer-events: none;
+  width: 18px;
+  height: 18px;
+}
+.sparkle::before,
+.sparkle::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  clip-path: polygon(50% 0%, 53% 47%, 100% 50%, 53% 53%, 50% 100%, 47% 53%, 0% 50%, 47% 47%);
+}
+.sparkle-1 { animation: sparkle-1 2.4s ease-in-out infinite; }
+.sparkle-2 { animation: sparkle-2 3.1s ease-in-out 0.7s infinite; }
+.sparkle-3 { animation: sparkle-3 2.8s ease-in-out 1.4s infinite; }
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --deep-purple: #1A1A6E;
+  --deep-space: #0A0A1E;
+  --gold: #FFD700;
+  --gauge: #8B5CF6;
+}
+
+body {
+  margin: 0;
+  font-family: 'Mulmaru', system-ui, sans-serif;
+  background: var(--deep-space);
+  color: #f3f4f6;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
