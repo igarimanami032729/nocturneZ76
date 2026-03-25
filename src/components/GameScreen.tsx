@@ -1,6 +1,19 @@
 import { useEffect, useLayoutEffect, useState, useCallback, useRef, memo } from 'react';
 import { useGameStore } from '../store/gameStore';
 import { loadScript } from '../game/engine';
+import {
+  startTempleOfTimeBgm,
+  stopTempleOfTimeBgm,
+  startMagatiaBgm,
+  stopMagatiaBgm,
+  startLakeOfOblivionBgm,
+  stopLakeOfOblivionBgm,
+  startRienBgm,
+  stopRienBgm,
+  startEreveTrainingForestBgm,
+  stopEreveTrainingForestBgm,
+  stopCellasWhereStarsRestBgm,
+} from '../bgm';
 import { DialogueScreen } from './DialogueScreen';
 import { ChoiceScreen } from './ChoiceScreen';
 import { ChoiceResultScreen } from './ChoiceResultScreen';
@@ -14,7 +27,7 @@ function EyeOpenOverlay({
   contentRef,
 }: {
   onDone: () => void;
-  contentRef: React.RefObject<HTMLDivElement>;
+  contentRef: React.RefObject<HTMLDivElement | null>;
 }) {
   const svgPathRef = useRef<SVGPathElement>(null);
   const blurRef    = useRef<HTMLDivElement>(null);
@@ -223,7 +236,7 @@ export function GameScreen() {
   const chapterTransition     = useGameStore((s) => s.chapterTransition);
   const setScript             = useGameStore((s) => s.setScript);
 
-  const contentBlurRef      = useRef<HTMLDivElement>(null);
+  const contentBlurRef      = useRef<HTMLDivElement | null>(null);
   const prevSceneRef        = useRef<string | null>(null);
   const prevRenderedSceneRef = useRef<string>(currentSceneId);
   const [isSceneBlinking, setIsSceneBlinking] = useState(false);
@@ -265,6 +278,75 @@ export function GameScreen() {
       .then((s) => { setScript(s); setLoaded(true); })
       .catch((e) => setError(e?.message ?? '스크립트 로드 실패'));
   }, [script, setScript]);
+
+  // ── BGM 씬 트리거 ──────────────────────────────────────────────────────────
+  // 에레브(Maple) : scene_1_1 — 첫 대사~선택~결과
+  // 리엔(Maple)   : scene_2_1 — 연습실 구간
+  // 망각의 호수   : scene_2_2(어린왕자)~scene_3_1(N042 고백·선택·결과) — 동일 분위기
+  // 시간의 신전  : scene_3_2(수호자 폭풍)~scene_5_1(공연 전날) — 이름 되찾기(scene_5_star) 직전까지
+  // 마가티아      : scene_1_2, scene_5_2
+  // scene_5_star : 전부 정지 → NameRevealScreen 엔딩 BGM
+  useEffect(() => {
+    // 최초 오프닝 눈 뜨기 전에는 어떤 게임 BGM도 재생하지 않음
+    if (!eyeDone) {
+      stopTempleOfTimeBgm();
+      stopMagatiaBgm();
+      stopLakeOfOblivionBgm();
+      stopRienBgm();
+      stopEreveTrainingForestBgm();
+      stopCellasWhereStarsRestBgm();
+      return;
+    }
+
+    const magatiaScenes = ['scene_1_2', 'scene_5_2'];
+    const templeScenes    = ['scene_3_2', 'scene_4_1', 'scene_4_2', 'scene_5_1'];
+    const lakeScenes      = ['scene_2_2', 'scene_3_1'];
+
+    if (currentSceneId === 'scene_1_1') {
+      stopTempleOfTimeBgm();
+      stopCellasWhereStarsRestBgm();
+      stopMagatiaBgm();
+      stopLakeOfOblivionBgm();
+      stopRienBgm();
+      startEreveTrainingForestBgm();
+    } else if (currentSceneId === 'scene_2_1') {
+      stopTempleOfTimeBgm();
+      stopCellasWhereStarsRestBgm();
+      stopMagatiaBgm();
+      stopLakeOfOblivionBgm();
+      stopEreveTrainingForestBgm();
+      startRienBgm();
+    } else if (templeScenes.includes(currentSceneId)) {
+      stopMagatiaBgm();
+      stopRienBgm();
+      stopEreveTrainingForestBgm();
+      stopLakeOfOblivionBgm();
+      stopCellasWhereStarsRestBgm();
+      startTempleOfTimeBgm();
+    } else if (magatiaScenes.includes(currentSceneId)) {
+      stopTempleOfTimeBgm();
+      stopLakeOfOblivionBgm();
+      stopRienBgm();
+      stopEreveTrainingForestBgm();
+      stopCellasWhereStarsRestBgm();
+      startMagatiaBgm();
+    } else if (lakeScenes.includes(currentSceneId)) {
+      stopTempleOfTimeBgm();
+      stopMagatiaBgm();
+      stopRienBgm();
+      stopEreveTrainingForestBgm();
+      stopCellasWhereStarsRestBgm();
+      startLakeOfOblivionBgm();
+    } else {
+      stopTempleOfTimeBgm();
+      stopMagatiaBgm();
+      stopLakeOfOblivionBgm();
+      stopRienBgm();
+      stopEreveTrainingForestBgm();
+      stopCellasWhereStarsRestBgm();
+    }
+  }, [currentSceneId, eyeDone]);
+
 
   if (error) {
     return (

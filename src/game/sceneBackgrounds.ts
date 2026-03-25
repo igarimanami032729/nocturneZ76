@@ -15,5 +15,6 @@ export const SCENE_BACKGROUNDS: Record<string, string> = {
   // CHAPTER 5 — 무대
   scene_5_1: '/background1_city.png',
   scene_5_star: '/background4_view.png',
-  scene_5_2: '/background4_view.png',
+  // 크리스탈 본명 대사 이후 ~ 엔딩 크레딧 직전
+  scene_5_2: '/background6_stage.png',
 };

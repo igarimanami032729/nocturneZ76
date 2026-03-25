@@ -126,70 +126,135 @@ export function ChoiceResultScreen() {
   // ── Phase 1: 결과 발표 ──────────────────────────────────────────────────────
   if (phase === 'result') {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center" style={{ ...bgStyle, position: 'relative', cursor: 'pointer' }} onClick={handleAdvance}>
+      <div
+        onClick={handleAdvance}
+        style={{
+          position: 'fixed', inset: 0,
+          background: '#04040F',
+          cursor: 'pointer',
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
         <style>{`
-          @keyframes scanline { 0%{transform:translateY(-100%)} 100%{transform:translateY(100vh)} }
-          @keyframes fadeInUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-          @keyframes glowPulse { 0%,100%{opacity:0.7} 50%{opacity:1} }
-          @keyframes statPop { from{opacity:0;transform:scale(0.7)} to{opacity:1;transform:scale(1)} }
+          @keyframes scanline    { 0%{transform:translateY(-100%)} 100%{transform:translateY(100vh)} }
+          @keyframes fadeInUp    { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+          @keyframes glowPulse   { 0%,100%{opacity:0.6} 50%{opacity:1} }
+          @keyframes statPop     { from{opacity:0;transform:scale(0.7)} to{opacity:1;transform:scale(1)} }
+          @keyframes cr-slidein  { from{opacity:0;transform:translateX(-16px)} to{opacity:1;transform:translateX(0)} }
+          @keyframes cr-slideright { from{opacity:0;transform:translateX(16px)} to{opacity:1;transform:translateX(0)} }
+          @keyframes cr-pulse    { 0%,100%{opacity:0.45} 50%{opacity:0.9} }
         `}</style>
 
-        {/* 배경 오버레이 */}
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 0 }} />
-
-        {/* 스캔라인 효과 */}
+        {/* 배경 그리드 */}
         <div style={{
-          position: 'fixed', inset: 0, zIndex: 1, pointerEvents: 'none', overflow: 'hidden',
-        }}>
+          position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none',
+          backgroundImage: [
+            'linear-gradient(rgba(139,92,246,0.04) 1px, transparent 1px)',
+            'linear-gradient(90deg, rgba(139,92,246,0.04) 1px, transparent 1px)',
+          ].join(','),
+          backgroundSize: '48px 48px',
+        }} />
+
+        {/* 스캔라인 */}
+        <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
           <div style={{
-            position: 'absolute', left: 0, right: 0, height: '2px',
-            background: 'linear-gradient(90deg, transparent, rgba(139,92,246,0.4), transparent)',
-            animation: 'scanline 4s linear infinite',
+            position: 'absolute', left: 0, right: 0, height: '1px',
+            background: 'linear-gradient(90deg, transparent, rgba(139,92,246,0.35), rgba(255,215,0,0.2), transparent)',
+            animation: 'scanline 8s linear infinite',
           }} />
         </div>
 
-        {/* 메인 결과 패널 */}
+        {/* 최상단 시스템 상태바 */}
         <div style={{
-          position: 'relative', zIndex: 2,
-          width: '90%', maxWidth: '560px',
-          animation: 'fadeInUp 0.6s ease both',
+          position: 'relative', zIndex: 2, flexShrink: 0,
+          borderBottom: '1px solid rgba(139,92,246,0.25)',
+          background: 'linear-gradient(90deg, rgba(10,4,30,0.95) 0%, rgba(6,2,18,0.9) 100%)',
+          padding: '8px 24px',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          animation: 'fadeInUp 0.4s ease both',
         }}>
-          {/* 상단 강조선 */}
-          <div style={{ height: '2px', background: 'linear-gradient(90deg, transparent, #a78bfa 30%, #FFD700 50%, #a78bfa 70%, transparent)', marginBottom: '0' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <div style={{
+                width: '6px', height: '6px', borderRadius: '50%',
+                background: '#a78bfa', boxShadow: '0 0 6px #a78bfa',
+                animation: 'cr-pulse 1.8s ease-in-out infinite',
+              }} />
+              <span style={{ fontSize: '9px', color: 'rgba(167,139,250,0.7)', letterSpacing: '0.2em', fontFamily: 'monospace' }}>
+                NOCTURNE Z76
+              </span>
+            </div>
+            <span style={{ fontSize: '9px', color: 'rgba(139,92,246,0.4)', letterSpacing: '0.1em', fontFamily: 'monospace' }}>
+              SYS.CHOICE_RESULT
+            </span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '9px', color: 'rgba(255,215,0,0.5)', letterSpacing: '0.15em', fontFamily: 'monospace' }}>
+              {currentSceneId ?? 'SCENE'}
+            </span>
+          </div>
+        </div>
 
+        {/* 상단 금색 그라디언트 선 */}
+        <div style={{
+          height: '2px', flexShrink: 0,
+          background: 'linear-gradient(90deg, transparent, rgba(139,92,246,0.7) 30%, rgba(255,215,0,0.5) 50%, rgba(139,92,246,0.7) 70%, transparent)',
+        }} />
+
+        {/* 메인 2단 레이아웃 */}
+        <div style={{
+          flex: 1, display: 'flex', position: 'relative', zIndex: 1, minHeight: 0,
+        }}>
+
+          {/* 좌측 패널 (42%) */}
           <div style={{
-            background: 'linear-gradient(180deg, rgba(10,4,30,0.92) 0%, rgba(6,2,20,0.88) 100%)',
-            backdropFilter: 'blur(16px)',
-            WebkitBackdropFilter: 'blur(16px)',
-            border: '1px solid rgba(139,92,246,0.35)',
-            borderTop: 'none',
-            padding: '2rem 2.5rem 2.5rem',
+            width: '42%', flexShrink: 0,
+            display: 'flex', flexDirection: 'column', justifyContent: 'center',
+            padding: '2.5rem 2.5rem',
+            borderRight: '1px solid rgba(139,92,246,0.2)',
+            background: 'linear-gradient(135deg, rgba(10,4,30,0.6) 0%, transparent 100%)',
+            animation: 'cr-slidein 0.5s ease 0.1s both',
           }}>
-            {/* RESULT 레이블 */}
+            {/* CHOICE RESULT 레이블 */}
             <div style={{
-              fontSize: '10px', letterSpacing: '0.3em', color: 'rgba(167,139,250,0.7)',
-              marginBottom: '0.5rem', animation: 'glowPulse 2s ease-in-out infinite',
+              fontSize: '9px', letterSpacing: '0.35em',
+              color: 'rgba(167,139,250,0.65)', fontFamily: 'monospace',
+              marginBottom: '1.25rem',
+              animation: 'glowPulse 2.2s ease-in-out infinite',
             }}>
               ◈ CHOICE RESULT ◈
             </div>
 
             {/* 제목 */}
-            <h2 style={{
-              fontSize: '1.4rem', color: '#FFD700', marginBottom: '1.2rem',
-              fontWeight: 'bold', letterSpacing: '0.04em',
-              textShadow: '0 0 12px rgba(255,215,0,0.5)',
-            }}>
-              {choiceResultContent.title}
-            </h2>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <h2 style={{
+                fontSize: 'clamp(1.05rem, 2.2vw, 1.35rem)',
+                color: '#FFD700',
+                fontWeight: 800,
+                letterSpacing: '0.04em',
+                lineHeight: 1.35,
+                textShadow: '0 0 16px rgba(255,215,0,0.45)',
+                margin: 0,
+              }}>
+                {choiceResultContent.title}
+              </h2>
+            </div>
 
             {/* 구분선 */}
-            <div style={{ height: '1px', background: 'rgba(139,92,246,0.3)', marginBottom: '1.2rem' }} />
+            <div style={{ height: '1px', background: 'rgba(139,92,246,0.3)', marginBottom: '1.25rem' }} />
 
             {/* 나레이션 */}
             {choiceResultContent.narration && (
               <p style={{
-                color: 'rgba(220,210,255,0.9)', lineHeight: 1.75, marginBottom: '1.5rem',
-                fontStyle: 'italic', fontSize: '0.97rem',
+                color: 'rgba(220,210,255,0.88)',
+                lineHeight: 1.8,
+                marginBottom: '1.25rem',
+                fontStyle: 'italic',
+                fontSize: '0.95rem',
+                borderLeft: '3px solid rgba(139,92,246,0.45)',
+                paddingLeft: '14px',
               }}>
                 {choiceResultContent.narration}
               </p>
@@ -198,55 +263,112 @@ export function ChoiceResultScreen() {
             {/* 시스템 알림 */}
             {choiceResultContent.system_alert && (
               <div style={{
-                background: 'rgba(251,191,36,0.1)', border: '1px solid rgba(251,191,36,0.35)',
-                borderRadius: '6px', padding: '10px 14px', marginBottom: '1.2rem',
-                color: '#fbbf24', fontSize: '0.88rem',
+                background: 'rgba(251,191,36,0.06)',
+                border: '1px solid rgba(251,191,36,0.35)',
+                borderLeft: '3px solid #fbbf24',
+                borderRadius: '0 4px 4px 0',
+                padding: '10px 14px',
+                marginBottom: '1.25rem',
+                display: 'flex', alignItems: 'flex-start', gap: '10px',
               }}>
-                ⚠ {choiceResultContent.system_alert}
+                <span style={{ color: '#fbbf24', fontSize: '12px', flexShrink: 0, marginTop: '2px' }}>⚠</span>
+                <span style={{ color: 'rgba(251,191,36,0.9)', fontSize: '0.88rem', lineHeight: 1.6, fontFamily: 'monospace' }}>
+                  {choiceResultContent.system_alert}
+                </span>
               </div>
             )}
 
-            {/* 스탯 변화 */}
-            {changes.length > 0 && (
-              <div style={{ marginBottom: '1.5rem' }}>
-                <div style={{ fontSize: '9px', color: 'rgba(167,139,250,0.6)', letterSpacing: '0.2em', marginBottom: '0.75rem' }}>
-                  STAT CHANGES
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {changes.map(({ key, label, value }, i) => {
-                    const isAffinity = key === 'affinity_jade' || key === 'affinity_Z314' || key === 'affinity_crystal';
-                    const hearts = isAffinity ? getAffinityHearts(key) : null;
-                    return (
+            {/* 하단 힌트 */}
+            <div style={{ marginTop: 'auto', paddingTop: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+              <span style={{
+                fontSize: '10px', letterSpacing: '0.2em',
+                color: 'rgba(167,139,250,0.5)',
+                fontFamily: 'monospace',
+                animation: 'glowPulse 1.8s ease-in-out infinite',
+              }}>
+                클릭하여 계속 ▶
+              </span>
+            </div>
+          </div>
+
+          {/* 우측 패널 — 스탯 변화 */}
+          <div style={{
+            flex: 1,
+            display: 'flex', flexDirection: 'column', justifyContent: 'center',
+            padding: '2.5rem 2rem',
+            animation: 'cr-slideright 0.55s ease 0.15s both',
+          }}>
+
+            {/* STAT CHANGES 헤더 */}
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: '10px',
+              marginBottom: '1rem',
+            }}>
+              <div style={{ width: '3px', height: '14px', background: '#FFD700', borderRadius: '2px', boxShadow: '0 0 6px rgba(255,215,0,0.6)' }} />
+              <span style={{ fontSize: '9px', letterSpacing: '0.3em', color: 'rgba(255,215,0,0.75)', fontFamily: 'monospace' }}>
+                ◈ STAT CHANGES ◈
+              </span>
+              <div style={{ flex: 1, height: '1px', background: 'rgba(255,215,0,0.15)' }} />
+            </div>
+
+            {changes.length > 0 ? (
+              <div style={{
+                border: '1px solid rgba(139,92,246,0.28)',
+                overflow: 'hidden',
+                background: 'linear-gradient(180deg, rgba(10,4,30,0.72) 0%, rgba(6,2,18,0.88) 100%)',
+              }}>
+                {changes.map(({ key, label, value }, i) => {
+                  const isAffinity = key === 'affinity_jade' || key === 'affinity_Z314' || key === 'affinity_crystal';
+                  const hearts = isAffinity ? getAffinityHearts(key) : null;
+                  const isPositive = value >= 0;
+                  const isMax = value === 999;
+                  const accentColor = isPositive ? '#a78bfa' : '#f87171';
+                  const accentDim = isPositive ? 'rgba(139,92,246,0.22)' : 'rgba(239,68,68,0.22)';
+                  return (
                     <div key={label} style={{
-                      display: 'flex', flexDirection: 'column', gap: '4px',
-                      opacity: statVisible ? 1 : 0,
-                      animation: statVisible ? `statPop 0.4s ease ${i * 0.1}s both` : 'none',
+                      display: 'flex', flexDirection: 'column',
+                      borderBottom: i < changes.length - 1 ? '1px solid rgba(139,92,246,0.12)' : 'none',
+                      ...(statVisible ? { animation: `statPop 0.4s ease ${i * 0.1}s both` } : { opacity: 0 }),
                     }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <span style={{ fontSize: '11px', color: 'rgba(200,190,255,0.7)', minWidth: '90px' }}>{label}</span>
-                        {/* 바 */}
-                        <div style={{ flex: 1, height: '6px', background: 'rgba(255,255,255,0.06)', borderRadius: '3px', overflow: 'hidden' }}>
-                          <div style={{
-                            height: '100%',
-                            width: value === 999 ? '100%' : `${Math.min(100, Math.abs(value) * 10)}%`,
-                            background: value >= 0
-                              ? 'linear-gradient(90deg, #8b5cf6, #a78bfa)'
-                              : 'linear-gradient(90deg, #ef4444, #f87171)',
-                            borderRadius: '3px',
-                            boxShadow: value >= 0 ? '0 0 6px rgba(139,92,246,0.7)' : '0 0 6px rgba(239,68,68,0.7)',
-                            transition: 'width 0.8s ease',
-                          }} />
-                        </div>
-                        <span style={{
-                          fontSize: '12px', fontFamily: 'monospace', minWidth: '42px', textAlign: 'right',
-                          color: value >= 0 ? '#c4b5fd' : '#f87171',
-                          fontWeight: 'bold',
+                      <div style={{ display: 'flex', alignItems: 'stretch', minHeight: '66px' }}>
+                        {/* 값 뱃지 */}
+                        <div style={{
+                          width: '74px', flexShrink: 0,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          background: `linear-gradient(135deg, ${accentDim} 0%, rgba(8,4,24,0.7) 100%)`,
+                          borderRight: '1px solid rgba(139,92,246,0.15)',
+                          position: 'relative',
                         }}>
-                          {value >= 0 ? '+' : ''}{value === 999 ? 'MAX' : value}
-                        </span>
+                          <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '3px', background: accentColor, boxShadow: `0 0 8px ${accentColor}` }} />
+                          <span style={{
+                            fontSize: '24px', fontFamily: 'monospace', fontWeight: 800,
+                            lineHeight: 1, color: accentColor,
+                            textShadow: `0 0 14px ${accentColor}88`,
+                          }}>
+                            {isPositive ? '+' : ''}{isMax ? 'MAX' : value}
+                          </span>
+                        </div>
+                        {/* 레이블 + 증감 */}
+                        <div style={{
+                          flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center',
+                          padding: '0 14px',
+                          background: 'linear-gradient(90deg, rgba(14,6,38,0.72) 0%, rgba(6,2,18,0.88) 100%)',
+                          gap: '3px',
+                        }}>
+                          <span style={{ fontSize: '13px', color: 'rgba(230,220,255,0.92)', fontWeight: 600, lineHeight: 1.2 }}>{label}</span>
+                          <span style={{ fontSize: '9px', color: `${accentColor}99`, letterSpacing: '0.1em', fontWeight: 500 }}>
+                            {isPositive ? '▲ INCREASE' : '▼ DECREASE'}
+                          </span>
+                        </div>
                       </div>
                       {isAffinity && hearts && hearts.total > 0 && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '3px', paddingLeft: '90px' }}>
+                        <div style={{
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                          padding: '8px 12px',
+                          background: 'linear-gradient(90deg, rgba(30,6,40,0.85) 0%, rgba(10,2,20,0.92) 100%)',
+                          borderTop: '1px solid rgba(244,114,182,0.18)',
+                        }}>
+                          <span style={{ fontSize: '9px', letterSpacing: '0.15em', color: 'rgba(244,114,182,0.6)', fontWeight: 600, marginRight: '4px', fontFamily: 'monospace' }}>AFFINITY</span>
                           {Array.from({ length: hearts.total }).map((_, hi) => (
                             <span key={hi} style={{
                               fontSize: '13px',
@@ -260,23 +382,35 @@ export function ChoiceResultScreen() {
                         </div>
                       )}
                     </div>
-                    );
-                  })}
-                </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div style={{
+                fontSize: '11px', color: 'rgba(167,139,250,0.35)',
+                textAlign: 'center', padding: '2rem 0', fontFamily: 'monospace',
+                letterSpacing: '0.15em',
+              }}>
+                — NO STAT CHANGES —
               </div>
             )}
-
-            {/* 계속 힌트 */}
-            <div style={{
-              textAlign: 'right', fontSize: '10px', color: 'rgba(167,139,250,0.5)',
-              letterSpacing: '0.1em', animation: 'glowPulse 1.8s ease-in-out infinite',
-            }}>
-              클릭하여 계속 ▶
-            </div>
           </div>
+        </div>
 
-          {/* 하단 강조선 */}
-          <div style={{ height: '2px', background: 'linear-gradient(90deg, transparent, #a78bfa 30%, #FFD700 50%, #a78bfa 70%, transparent)' }} />
+        {/* 최하단 상태바 */}
+        <div style={{
+          position: 'relative', zIndex: 2, flexShrink: 0,
+          borderTop: '1px solid rgba(139,92,246,0.15)',
+          background: 'rgba(4,4,15,0.9)',
+          padding: '6px 24px',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        }}>
+          <span style={{ fontSize: '8px', color: 'rgba(139,92,246,0.3)', letterSpacing: '0.15em', fontFamily: 'monospace' }}>
+            {currentSceneId ?? 'SCENE_ID'}
+          </span>
+          <span style={{ fontSize: '8px', color: 'rgba(139,92,246,0.3)', letterSpacing: '0.15em', fontFamily: 'monospace' }}>
+            RESULT LOG
+          </span>
         </div>
       </div>
     );
@@ -288,7 +422,6 @@ export function ChoiceResultScreen() {
     ? (currentLine.speaker_label ?? getSpeakerDisplayName(currentLine.speaker, resolvedName))
         .replace('[진짜 이름]', resolvedName)
     : '';
-  const isLast = dialogueIdx >= dialogues.length - 1;
   const isGuardian = currentLine?.speaker === 'guardian';
 
   return (
@@ -319,6 +452,9 @@ export function ChoiceResultScreen() {
           0%,100% { opacity: 0.5; transform: translateX(-50%) scale(1); }
           50%     { opacity: 0.75; transform: translateX(-50%) scale(1.05); }
         }
+        @keyframes cr2-scan { 0%{transform:translateY(-100%)} 100%{transform:translateY(100vh)} }
+        @keyframes cr2-pulse { 0%,100%{opacity:0.45} 50%{opacity:0.9} }
+        @keyframes cr2-blink { 0%,100%{opacity:1} 50%{opacity:0} }
       `}</style>
 
       {letterBgLayers}
@@ -332,19 +468,46 @@ export function ChoiceResultScreen() {
         }} />
       )}
 
-      {/* HUD */}
+      {/* HUD — SF 터미널 스타일 */}
       <header style={{
-        position: 'relative', zIndex: 1,
-        background: 'linear-gradient(180deg, rgba(0,0,0,0.88) 0%, rgba(6,2,20,0.80) 100%)',
-        borderBottom: '1px solid rgba(139,92,246,0.35)',
+        position: 'relative', zIndex: 2,
+        background: 'linear-gradient(180deg, rgba(4,2,18,0.97) 0%, rgba(6,2,20,0.90) 100%)',
+        borderBottom: '1px solid rgba(139,92,246,0.3)',
         padding: 0, flexShrink: 0,
       }}>
+        {/* 상단 금색 그라디언트 선 */}
         <div style={{ height: '2px', background: 'linear-gradient(90deg, transparent, rgba(139,92,246,0.7) 30%, rgba(255,215,0,0.5) 50%, rgba(139,92,246,0.7) 70%, transparent)' }} />
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 20px' }}>
-          <div style={{ fontSize: '10px', color: 'rgba(167,139,250,0.6)', letterSpacing: '0.15em' }}>◈ RESULT SCENE</div>
-          <div style={{ fontSize: '11px', color: '#FFD700', letterSpacing: '0.06em' }}>{choiceResultContent.title}</div>
-          <div style={{ fontSize: '10px', color: 'rgba(167,139,250,0.6)', letterSpacing: '0.1em' }}>
-            {dialogueIdx + 1} / {dialogues.length}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '9px 20px' }}>
+          {/* 좌: 씬 레이블 + 제목 */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <div style={{
+                width: '5px', height: '5px', borderRadius: '50%',
+                background: '#a78bfa', boxShadow: '0 0 5px #a78bfa',
+                animation: 'cr2-pulse 1.8s ease-in-out infinite',
+              }} />
+              <span style={{ fontSize: '9px', color: 'rgba(167,139,250,0.65)', letterSpacing: '0.25em', fontFamily: 'monospace' }}>
+                ◈ RESULT SCENE
+              </span>
+            </div>
+            <span style={{
+              fontSize: '11px', color: '#FFD700', letterSpacing: '0.05em', fontWeight: 600,
+              textShadow: '0 0 8px rgba(255,215,0,0.3)',
+            }}>
+              {choiceResultContent.title}
+            </span>
+          </div>
+          {/* 우: 대사 카운터 */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ fontSize: '9px', color: 'rgba(167,139,250,0.45)', letterSpacing: '0.1em', fontFamily: 'monospace' }}>
+              COMM LOG
+            </span>
+            <span style={{
+              fontSize: '11px', color: 'rgba(255,215,0,0.7)', letterSpacing: '0.08em',
+              fontFamily: 'monospace', fontWeight: 600,
+            }}>
+              {String(dialogueIdx + 1).padStart(2, '0')} / {String(dialogues.length).padStart(2, '0')}
+            </span>
           </div>
         </div>
       </header>
@@ -383,7 +546,7 @@ export function ChoiceResultScreen() {
           {changes.length > 0 && (
             <div style={{
               position: 'absolute', top: '50%', right: '12px', transform: 'translateY(-50%)',
-              width: '220px', zIndex: 3,
+              width: '300px', zIndex: 3,
               backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)',
               overflow: 'hidden', borderRadius: '6px',
               border: '1px solid rgba(255,215,0,0.28)',
@@ -404,15 +567,15 @@ export function ChoiceResultScreen() {
                   const hearts = isAffinity ? getAffinityHearts(key) : null;
                   return (
                     <div key={label} style={{ display: 'flex', flexDirection: 'column', borderBottom: i < changes.length - 1 ? '1px solid rgba(255,215,0,0.12)' : 'none', animation: `rs-fadeInUp 0.35s ease ${0.12 + i * 0.08}s both` }}>
-                      <div style={{ display: 'flex', alignItems: 'stretch', minHeight: '60px' }}>
-                        <div style={{ width: '64px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: `linear-gradient(135deg, ${accentDim} 0%, rgba(8,4,24,0.7) 100%)`, borderRight: '1px solid rgba(255,215,0,0.15)', position: 'relative' }}>
+                      <div style={{ display: 'flex', alignItems: 'stretch', minHeight: '66px' }}>
+                        <div style={{ width: '74px', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: `linear-gradient(135deg, ${accentDim} 0%, rgba(8,4,24,0.7) 100%)`, borderRight: '1px solid rgba(255,215,0,0.15)', position: 'relative' }}>
                           <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '3px', background: accentColor, boxShadow: `0 0 8px ${accentColor}` }} />
-                          <span style={{ fontSize: '20px', fontFamily: 'monospace', fontWeight: '800', lineHeight: 1, color: accentColor, textShadow: `0 0 14px ${accentColor}88` }}>
+                          <span style={{ fontSize: '24px', fontFamily: 'monospace', fontWeight: '800', lineHeight: 1, color: accentColor, textShadow: `0 0 14px ${accentColor}88` }}>
                             {isPositive ? '+' : ''}{isMax ? 'MAX' : value}
                           </span>
                         </div>
-                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 12px', background: 'linear-gradient(90deg, rgba(14,6,38,0.72) 0%, rgba(6,2,18,0.88) 100%)', gap: '3px' }}>
-                          <span style={{ fontSize: '12px', color: 'rgba(230,220,255,0.92)', fontWeight: 600, lineHeight: 1.2 }}>{label}</span>
+                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 14px', background: 'linear-gradient(90deg, rgba(14,6,38,0.72) 0%, rgba(6,2,18,0.88) 100%)', gap: '3px' }}>
+                          <span style={{ fontSize: '13px', color: 'rgba(230,220,255,0.92)', fontWeight: 600, lineHeight: 1.2 }}>{label}</span>
                           <span style={{ fontSize: '9px', color: `${accentColor}99`, letterSpacing: '0.1em', fontWeight: 500 }}>{isPositive ? '▲ INCREASE' : '▼ DECREASE'}</span>
                         </div>
                       </div>
@@ -483,6 +646,8 @@ export function ChoiceResultScreen() {
               <img src="/crystal_choice4.png" alt="크리스탈" style={{ width: '320px', height: '420px', objectFit: 'contain', objectPosition: 'bottom', flexShrink: 0, filter: 'drop-shadow(0px 8px 24px rgba(80,60,180,0.7)) drop-shadow(0px 2px 8px rgba(0,0,0,0.9))' }} />
             ) : choiceResultContent.title === '안정적 진행 / 팀워크 스탯 MAX' ? (
               <img src="/jade_littleprince2.png" alt="제이드" style={{ width: '320px', height: '420px', objectFit: 'contain', objectPosition: 'bottom', flexShrink: 0, filter: 'drop-shadow(0px 8px 24px rgba(80,60,180,0.7)) drop-shadow(0px 2px 8px rgba(0,0,0,0.9))' }} />
+            ) : choiceResultContent.title === '사명 엔딩 / 가장 웅장한 무대 연출' ? (
+              <img src="/jade_littleprince3.png" alt="제이드" style={{ width: '320px', height: '420px', objectFit: 'contain', objectPosition: 'bottom', flexShrink: 0, filter: 'drop-shadow(0px 8px 24px rgba(80,60,180,0.7)) drop-shadow(0px 2px 8px rgba(0,0,0,0.9))' }} />
             ) : isLetterScene ? null : (
               <div style={{ width: '220px', height: '320px', borderRadius: '8px', border: '1px solid rgba(139,92,246,0.25)', background: 'rgba(0,0,0,0.15)', flexShrink: 0 }} />
             )}
@@ -564,40 +729,98 @@ export function ChoiceResultScreen() {
         </div>
       )}
 
-      {/* 대사창 (전체 너비) */}
+      {/* 대사창 — SF 터미널 스타일 (DialogueScreen과 통일) */}
       <div
         role="button"
         tabIndex={0}
         onClick={handleAdvance}
         onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleAdvance()}
         style={{
-          margin: '0 0.75rem 0.75rem',
-          padding: '1rem 1.25rem',
-          paddingBottom: '2.5rem',
-          borderRadius: '10px',
-          border: '1px solid rgba(139,92,246,0.2)',
-          minHeight: '110px',
-          cursor: 'pointer',
-          background: sceneBg ? 'rgba(0,0,0,0.68)' : 'rgba(0,0,0,0.45)',
           position: 'relative', zIndex: 1,
+          margin: '0 16px 16px',
+          minHeight: '130px',
+          cursor: 'pointer',
           outline: 'none',
-          flexShrink: 0,
+          background: sceneBg
+            ? 'linear-gradient(135deg, rgba(2,6,20,0.93) 0%, rgba(4,10,28,0.90) 100%)'
+            : 'linear-gradient(135deg, rgba(4,8,26,0.82) 0%, rgba(2,4,18,0.78) 100%)',
+          border: '1px solid rgba(0,180,255,0.28)',
+          boxShadow: '0 0 20px rgba(0,100,255,0.08), 0 4px 20px rgba(0,0,0,0.5), inset 0 0 30px rgba(0,60,140,0.04)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
         }}
       >
-        <p style={{ fontSize: '0.8rem', color: 'rgba(167,139,250,0.85)', marginBottom: '0.3rem' }}>{speakerName}</p>
-        <p style={{ color: '#fff', lineHeight: 1.7, fontSize: '0.97rem' }}>
-          {displayText}
-          {isTyping && <span style={{ animation: 'rs-glowPulse 0.6s ease-in-out infinite' }}>|</span>}
-        </p>
+        {/* SF 코너 데코레이터 */}
+        <div style={{ position: 'absolute', top: -1, left: -1, width: '14px', height: '14px', borderTop: '2px solid rgba(0,200,255,0.85)', borderLeft: '2px solid rgba(0,200,255,0.85)', pointerEvents: 'none', animation: 'rs-glowPulse 2.5s ease-in-out infinite' }} />
+        <div style={{ position: 'absolute', top: -1, right: -1, width: '14px', height: '14px', borderTop: '2px solid rgba(0,200,255,0.85)', borderRight: '2px solid rgba(0,200,255,0.85)', pointerEvents: 'none', animation: 'rs-glowPulse 2.5s ease-in-out infinite 0.6s' }} />
+        <div style={{ position: 'absolute', bottom: -1, left: -1, width: '14px', height: '14px', borderBottom: '2px solid rgba(0,200,255,0.85)', borderLeft: '2px solid rgba(0,200,255,0.85)', pointerEvents: 'none', animation: 'rs-glowPulse 2.5s ease-in-out infinite 1.2s' }} />
+        <div style={{ position: 'absolute', bottom: -1, right: -1, width: '14px', height: '14px', borderBottom: '2px solid rgba(0,200,255,0.85)', borderRight: '2px solid rgba(0,200,255,0.85)', pointerEvents: 'none', animation: 'rs-glowPulse 2.5s ease-in-out infinite 1.8s' }} />
+
+        {/* 스캔라인 효과 */}
+        <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 0 }}>
+          <div style={{
+            position: 'absolute', left: 0, right: 0, height: '30%',
+            background: 'linear-gradient(180deg, transparent 0%, rgba(0,180,255,0.025) 50%, transparent 100%)',
+            animation: 'cr2-scan 5s linear infinite',
+          }} />
+        </div>
+
+        {/* 발화자 이름 바 */}
+        {currentLine && (
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '8px',
+            padding: '8px 14px 7px',
+            borderBottom: '1px solid rgba(0,160,255,0.18)',
+            background: isGuardian
+              ? 'linear-gradient(90deg, rgba(120,80,0,0.18), rgba(80,50,0,0.08), transparent)'
+              : 'linear-gradient(90deg, rgba(0,100,200,0.14), rgba(0,60,140,0.06), transparent)',
+            position: 'relative', zIndex: 1,
+          }}>
+            <div style={{ display: 'flex', gap: '2px', alignItems: 'center', flexShrink: 0 }}>
+              <div style={{ width: '3px', height: '14px', background: isGuardian ? 'rgba(255,215,0,0.9)' : 'rgba(0,210,255,0.9)', boxShadow: isGuardian ? '0 0 6px rgba(255,215,0,0.8)' : '0 0 6px rgba(0,210,255,0.8)' }} />
+              <div style={{ width: '2px', height: '9px', background: isGuardian ? 'rgba(255,215,0,0.4)' : 'rgba(0,210,255,0.4)' }} />
+            </div>
+            <span style={{
+              fontSize: '10px', fontFamily: 'monospace', letterSpacing: '0.18em',
+              color: isGuardian ? 'rgba(255,220,100,0.95)' : 'rgba(0,220,255,0.95)',
+              textShadow: isGuardian ? '0 0 8px rgba(255,200,0,0.5)' : '0 0 8px rgba(0,200,255,0.5)',
+              visibility: speakerName ? 'visible' : 'hidden',
+            }}>
+              {speakerName || 'SYSTEM'}
+            </span>
+            <div style={{ marginLeft: 'auto', fontSize: '8px', color: 'rgba(139,92,246,0.4)', fontFamily: 'monospace', letterSpacing: '0.2em' }}>
+              VOICE LOG
+            </div>
+          </div>
+        )}
+
+        {/* 대사 텍스트 */}
+        <div style={{ padding: '12px 16px 40px', position: 'relative', zIndex: 1 }}>
+          <p style={{
+            color: isGuardian ? 'rgba(255,235,160,0.95)' : 'rgba(205,228,255,0.95)',
+            lineHeight: 1.85,
+            fontSize: '0.96rem',
+            letterSpacing: '0.025em',
+            margin: 0,
+          }}>
+            {displayText}
+            {isTyping && <span style={{ opacity: 0.6, animation: 'cr2-blink 0.8s step-end infinite' }}>|</span>}
+          </p>
+        </div>
+
+        {/* 다음 화살표 */}
         {!isTyping && (
           <div style={{
-            position: 'absolute', bottom: '12px', right: '16px',
-            opacity: 0.55, animation: 'arrowBounce 1.2s ease-in-out infinite',
+            position: 'absolute', bottom: '11px', right: '14px',
+            display: 'flex', alignItems: 'center', gap: '6px',
+            opacity: 0.55,
+            animation: 'arrowBounce 1.3s ease-in-out infinite',
+            zIndex: 2,
           }}>
-            {isLast
-              ? <svg width="20" height="16" viewBox="0 0 20 16" fill="none"><polygon points="2,2 18,2 10,14" fill="rgba(255,215,0,0.9)"/></svg>
-              : <svg width="20" height="16" viewBox="0 0 20 16" fill="none"><polygon points="2,2 18,2 10,14" fill="rgba(255,255,255,0.75)"/></svg>
-            }
+            <span style={{ fontSize: '8px', fontFamily: 'monospace', color: 'rgba(0,200,255,0.8)', letterSpacing: '0.15em' }}>NEXT</span>
+            <svg width="14" height="11" viewBox="0 0 20 16" fill="none">
+              <polygon points="2,2 18,2 10,14" fill="rgba(0,200,255,0.75)" />
+            </svg>
           </div>
         )}
       </div>

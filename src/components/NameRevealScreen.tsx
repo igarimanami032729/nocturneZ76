@@ -1,7 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useGameStore } from '../store/gameStore';
 import { getCurrentChapterAndScene, goToScene } from '../game/engine';
-import { startEndingBgm } from '../bgm';
+import {
+  startEndingBgm,
+  stopTempleOfTimeBgm,
+  stopMagatiaBgm,
+  stopLakeOfOblivionBgm,
+  stopRienBgm,
+  stopEreveTrainingForestBgm,
+  stopCellasWhereStarsRestBgm,
+} from '../bgm';
 
 const STEP_DURATION_MS = 4000;
 const TRANSFORM_DELAY_MS = 1100;
@@ -26,6 +34,12 @@ export function NameRevealScreen() {
   const [transformed, setTransformed] = useState<number[]>([]);
 
   useEffect(() => {
+    stopTempleOfTimeBgm();
+    stopMagatiaBgm();
+    stopLakeOfOblivionBgm();
+    stopRienBgm();
+    stopEreveTrainingForestBgm();
+    stopCellasWhereStarsRestBgm();
     startEndingBgm();
   }, []);
 
@@ -215,7 +229,7 @@ function CharacterSlot({
             width: '100%', height: '260px',
             objectFit: 'contain', objectPosition: 'bottom center',
             opacity: isTransformed ? 1 : 0,
-            animation: isTransformed ? 'idolReveal 0.9s cubic-bezier(0.22,1,0.36,1) both' : 'none',
+            ...(isTransformed ? { animation: 'idolReveal 0.9s cubic-bezier(0.22,1,0.36,1) both' } : {}),
             filter: 'drop-shadow(0 6px 20px rgba(255,215,0,0.35)) drop-shadow(0 2px 8px rgba(0,0,0,0.9))',
           }}
         />
@@ -272,7 +286,6 @@ function CharacterSlot({
           fontSize: '2rem', fontWeight: 'bold',
           color: '#FFD700',
           opacity: isTransformed ? 1 : 0,
-          animation: isTransformed ? 'fadeInUp 0.7s ease 0.2s both' : 'none',
           animationName: isTransformed ? 'nameGlow, fadeInUp' : 'none',
           animationDuration: '2.5s, 0.7s',
           animationTimingFunction: 'ease-in-out, ease',
@@ -343,7 +356,7 @@ function PlayerMirrorSlot({
           color: 'rgba(167,139,250,0.8)',
           textShadow: '0 0 10px rgba(139,92,246,0.6)',
           opacity: isTransformed ? 0 : (isOn ? 1 : 0),
-          animation: isTransformed ? 'codeDissolve 0.7s ease forwards' : 'none',
+          ...(isTransformed ? { animation: 'codeDissolve 0.7s ease forwards' } : {}),
           transition: isTransformed ? 'none' : 'opacity 0.5s ease',
         }}>
           E527

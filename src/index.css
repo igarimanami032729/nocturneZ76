@@ -7,7 +7,8 @@
 
 @font-face {
   font-family: 'GiantsInline';
-  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2307-1@1.1/Giants-Inline.woff2') format('woff2');
+  /* CDN(jsDelivr) 장애 시 폴백이 깨지므로 로컬 정적 파일 사용 */
+  src: url('/fonts/Giants-Inline.woff2') format('woff2');
   font-weight: normal;
   font-display: swap;
 }

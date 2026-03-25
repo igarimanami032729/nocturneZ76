@@ -1,7 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '../store/gameStore';
-import { startEndingBgm, stopEndingBgm } from '../bgm';
+import {
+  startEndingBgm,
+  stopEndingBgm,
+  stopTempleOfTimeBgm,
+  stopMagatiaBgm,
+  stopLakeOfOblivionBgm,
+  stopRienBgm,
+  stopEreveTrainingForestBgm,
+  stopCellasWhereStarsRestBgm,
+} from '../bgm';
 
 type Phase = 'glitch' | 'credits';
 
@@ -253,6 +262,12 @@ export function EndingScreen() {
   const info = currentEndingId ? ENDING_CREDITS[currentEndingId] : null;
 
   useEffect(() => {
+    stopTempleOfTimeBgm();
+    stopMagatiaBgm();
+    stopLakeOfOblivionBgm();
+    stopRienBgm();
+    stopEreveTrainingForestBgm();
+    stopCellasWhereStarsRestBgm();
     startEndingBgm(); // NameReveal에서 이어서 재생 (이미 재생 중이면 무시)
     const t = setTimeout(() => setPhase('credits'), 3200);
     return () => clearTimeout(t);

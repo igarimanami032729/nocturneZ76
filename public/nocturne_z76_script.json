@@ -777,7 +777,7 @@
           "narration": "공연이 끝난 후. 빛의 광장에 세 사람이 나란히 앉아 있다. 행성의 얼음 고리가 유난히 밝게 빛나는 밤.",
           "dialogues": [
             { "speaker": "crystal", "line": "이름을 되찾았어. 크리스탈. 내 진짜 이름.", "speaker_label": "크리스탈" },
-            { "speaker": "jade", "line": "어울린다." },
+            { "speaker": "jade", "line": "어울린다.", "speaker_label": "제이드" },
             { "speaker": "player", "line": "우리 모두 이름을 찾았네.", "speaker_label": "[진짜 이름]" },
             { "speaker": "narration", "line": "나는 누구지? — 그 질문에서 시작된 여정이 여기에 있다." },
             { "speaker": "narration", "line": "기억을 잃고, 이름을 잃고, 나를 잃었다고 생각했지만." },

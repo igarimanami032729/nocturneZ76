@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '../store/gameStore';
-import { stopEndingBgm } from '../bgm';
+import { stopEndingBgm, stopRienBgm, stopCellasWhereStarsRestBgm, stopEreveTrainingForestBgm } from '../bgm';
 
 export function TitleScreen() {
   const navigate = useNavigate();
@@ -11,6 +11,9 @@ export function TitleScreen() {
 
   useEffect(() => {
     stopEndingBgm(); // 엔딩에서 돌아왔을 때 ending BGM 종료
+    stopRienBgm();
+    stopEreveTrainingForestBgm();
+    stopCellasWhereStarsRestBgm();
     const audio = audioRef.current;
     if (!audio) return;
     audio.volume = 0.45;
@@ -30,12 +33,15 @@ export function TitleScreen() {
   const handleStart = () => {
     if (!name.trim()) return;
     setPlayerName(name.trim());
+    // 타이틀 페이지 오디오를 먼저 정지하고 다음 화면으로 이동
+    audioRef.current?.pause();
     navigate('/intro');
   };
 
   return (
     <div className="min-h-screen relative flex flex-col items-center justify-center p-6 overflow-hidden">
-      <audio ref={audioRef} src="/title_bgm.mp4" loop preload="auto" />
+      {/* 타이틀(오프닝 1페이지) 전용 BGM: 무한 루프 */}
+      <audio ref={audioRef} src="/ereve_full.mp4" loop preload="auto" />
       {/* 배경 동영상 */}
       <video
         autoPlay
@@ -51,7 +57,7 @@ export function TitleScreen() {
           zIndex: 0,
         }}
       >
-        <source src="/bg_main.mp4" type="video/mp4" />
+        <source src="/background_main.mp4" type="video/mp4" />
       </video>
 
       {/* 어두운 오버레이 */}
